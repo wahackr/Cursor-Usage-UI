@@ -2,7 +2,13 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
-const { ceilPercent, formatUsdFromCents, remainingPercent } = require('./usage-format.cjs');
+const { ceilPercent, formatUsdFromCents } = require('./usage-format.cjs');
+const {
+  CURSOR_SAFE_PREFIX,
+  decryptCursorAuthValue,
+  looksLikeJwt,
+  unwrapStoredValue
+} = require('./cursor-auth-decrypt.cjs');
 
 const USAGE_URL = 'https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage';
 const USAGE_SUMMARY_URL = 'https://cursor.com/api/usage-summary';
@@ -30,7 +36,7 @@ class CursorUsageClient {
     }
     const token = readAccessToken(this.stateDb);
     if (!token) {
-      throw new Error('Sign in to the Cursor desktop app on this profile');
+      throw tokenReadError(this.stateDb);
     }
 
     let raw;
@@ -73,24 +79,36 @@ function readStateValue(stateDb, key) {
   try {
     const row = db.prepare('SELECT value FROM ItemTable WHERE key = ?').get(key);
     if (!row?.value) return '';
-    const raw = String(row.value);
-    try {
-      const parsed = JSON.parse(raw);
-      return typeof parsed === 'string' ? parsed : raw;
-    } catch {
-      return raw.replace(/^"|"$/g, '');
-    }
+    return unwrapStoredValue(String(row.value));
   } finally {
     db.close();
   }
 }
 
 function readAccessToken(stateDb) {
-  const value = readStateValue(stateDb, 'cursorAuth/accessToken');
-  if (!value || value.includes('cursor-safe-storage:v1:')) {
-    return '';
+  if (!stateDb || !fs.existsSync(stateDb)) return '';
+  const raw = readStateValue(stateDb, 'cursorAuth/accessToken');
+  if (!raw) return '';
+  const token = decryptCursorAuthValue(raw, stateDb);
+  return looksLikeJwt(token) ? token : '';
+}
+
+function tokenReadError(stateDb) {
+  if (!stateDb || !fs.existsSync(stateDb)) {
+    return new Error(
+      `Cursor sign-in data not found at ${stateDb || resolveStateDbPath()}. Install the Cursor desktop app and sign in.`
+    );
   }
-  return value;
+  const raw = readStateValue(stateDb, 'cursorAuth/accessToken');
+  if (!raw) {
+    return new Error('Sign in to the Cursor desktop app on this profile');
+  }
+  if (raw.startsWith(CURSOR_SAFE_PREFIX)) {
+    return new Error(
+      'Could not decrypt Cursor credentials — run this widget as the same Windows user that uses Cursor'
+    );
+  }
+  return new Error('Sign in to the Cursor desktop app on this profile');
 }
 
 async function requestCurrentPeriodUsage(token, timeoutMs) {

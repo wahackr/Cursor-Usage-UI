@@ -60,7 +60,7 @@ Live data comes from:
 
 `POST https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage`
 
-with the bearer token from `cursorAuth/accessToken` in Cursor's `state.vscdb` (read-only via Node's built-in SQLite). Enterprise or team accounts that do not return plan percentages may fall back to `GET https://cursor.com/api/usage-summary` with the same session Cookie the dashboard uses.
+with the bearer token from `cursorAuth/accessToken` in Cursor's `state.vscdb` (read-only via Node's built-in SQLite). Recent Cursor builds encrypt that token as `cursor-safe-storage:v1:`; the widget decrypts it using the same OS storage Cursor uses (DPAPI on Windows, Keychain on macOS, Secret Service on Linux). Run the widget as the same OS user who runs Cursor. Enterprise or team accounts that do not return plan percentages may fall back to `GET https://cursor.com/api/usage-summary` with the same session Cookie the dashboard uses.
 
 This endpoint is undocumented and may change. Tokens are read from disk only when refreshing and are sent only to Cursor's HTTPS API.
 
