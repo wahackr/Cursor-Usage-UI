@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'">
+  <title>Cursor Usage</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div><div class="eyebrow">CURSOR PLAN</div><h1>Cursor usage</h1></div>
+      <div class="headerActions">
+        <button id="mini" class="icon" title="Mini mode" aria-label="Toggle mini mode">▤</button>
+        <button id="refresh" class="icon" title="Refresh" aria-label="Refresh">↻</button>
+      </div>
+    </header>
+    <div id="status" class="status"><span></span><span id="statusText">Connecting…</span></div>
+    <section id="strip" class="strip" aria-hidden="true">
+      <img class="stripLogo" src="../assets/cursor.svg" alt="Cursor" width="20" height="20" draggable="false">
+      <span class="stripChip" data-key="primary"><b id="stripPrimary">—</b><i>total</i></span>
+      <span class="stripChip" data-key="secondary"><b id="stripSecondary">—</b><i>auto</i></span>
+      <span id="stripReset" class="stripReset">—</span>
+      <span id="stripDot" class="stripDot"></span>
+      <button id="expand" class="stripBtn" title="Exit mini mode" aria-label="Exit mini mode">▢</button>
+    </section>
+    <section class="meters">
+      <article class="meter" data-key="primary">
+        <div class="meterTop"><div><span class="label">Billing cycle (total)</span><strong id="primaryRemaining">—</strong></div><span id="primaryLeft" class="pill">—</span></div>
+        <div class="track"><div id="primaryBar" class="bar"></div></div>
+        <p id="primaryReset">Waiting for live usage</p>
+      </article>
+      <article class="meter" data-key="secondary">
+        <div class="meterTop"><div><span class="label">Auto mode</span><strong id="secondaryRemaining">—</strong></div><span id="secondaryLeft" class="pill">—</span></div>
+        <div class="track"><div id="secondaryBar" class="bar"></div></div>
+        <p id="secondaryReset">Waiting for live usage</p>
+      </article>
+    </section>
+    <section class="facts">
+      <div><span>Plan</span><b id="plan">—</b></div>
+      <div><span>Included pool</span><b id="credits">—</b></div>
+      <div><span>API usage</span><b id="resetCredits">—</b></div>
+    </section>
+    <footer>
+      <div class="toggles">
+        <label><input id="alwaysOnTop" type="checkbox"><span>Always on top</span></label>
+        <label><input id="openAtLogin" type="checkbox"><span>Launch at login</span></label>
+      </div>
+      <div class="theme" id="themePicker" role="group" aria-label="Theme">
+        <button data-theme="system">Auto</button>
+        <button data-theme="light">Light</button>
+        <button data-theme="dark">Dark</button>
+      </div>
+      <button id="openUsage" class="link">Open Cursor settings ↗</button>
+      <p id="updated">Not updated yet</p>
+    </footer>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

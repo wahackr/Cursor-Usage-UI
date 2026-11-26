@@ -1,0 +1,39 @@
+{
+  "name": "cursor-usage-widget",
+  "version": "0.1.0",
+  "description": "Cross-platform desktop widget for Cursor plan usage limits",
+  "homepage": "https://github.com/wahackr/Cursor-Usage-UI",
+  "author": {
+    "name": "Wahackr",
+    "email": "wahbigbig@gmail.com"
+  },
+  "main": "src/main.cjs",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=24.22.1"
+  },
+  "scripts": {
+    "start": "electron .",
+    "generate:icon": "node scripts/generate-tray-icon.cjs",
+    "prestart": "node scripts/generate-tray-icon.cjs && node scripts/check-linux-sandbox.cjs",
+    "fix:linux-sandbox": "bash scripts/fix-linux-sandbox.sh",
+    "test": "node --test",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.local.cursorusagewidget",
+    "productName": "Cursor Usage Widget",
+    "files": ["src/**/*", "package.json"],
+    "mac": { "target": ["dmg", "zip"], "category": "public.app-category.developer-tools" },
+    "win": { "target": ["nsis", "portable"] },
+    "linux": { "target": ["AppImage", "deb"], "category": "Development" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+  }
+}
